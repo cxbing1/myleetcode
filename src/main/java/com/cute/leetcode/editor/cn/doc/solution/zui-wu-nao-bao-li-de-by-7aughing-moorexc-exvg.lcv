@@ -1,0 +1,69 @@
+> Problem: [2397. 被列覆盖的最多行数](https://leetcode.cn/problems/maximum-rows-covered-by-columns/description/)
+
+[TOC]
+
+# 思路
+
+Matrix行数和列树最大为12，可以采用无脑暴力递归，
+
+每次递归分别有两种情况:
+1.选择使用一次机会清除这一列的1，进入下一列。
+2.不做操作，直接进入下一列。
+
+递归函数的参数分别为：
+1.当前的Matrix矩阵数组。
+2.sum数组，用于统计每一行的1的个数，用于终止条件时的统计。
+3.当前正在操作的列的位置。
+4.还剩可以擦除的次数。
+
+# Code
+
+* []
+
+```C++
+class Solution {
+public:
+    int M,N;
+    int ans=0;
+    void DAMN(vector<vector<int>>matrix,vector<int>sum,int curr,int times)
+    {
+        if(times==0)
+        {
+            int ret=0;
+            for(int i=0;i<M;i++)
+            {
+                if(sum[i]==0)
+                    ret++;
+            }
+            if(ret>ans)
+                ans = ret;
+            return;
+        }
+        if(curr==N)
+            return;
+        if(N-curr+1 < times)
+            return;
+        DAMN(matrix,sum,curr+1,times);
+        for(int i=0;i<M;i++)
+        {
+            if(matrix[i][curr]==1)
+            {
+                matrix[i][curr]=0;
+                sum[i]--;
+            }
+        }
+        DAMN(matrix,sum,curr+1,times-1);
+        return;
+    }
+    int maximumRows(vector<vector<int>>& matrix, int numSelect) {
+        int m=matrix.size(),n=matrix[0].size();//m行n列
+        M=m,N=n;
+        vector<int>sum(m);
+        for(int i=0;i<m;i++)
+            sum[i] = accumulate(matrix[i].begin(),matrix[i].end(),0);
+        DAMN(matrix,sum,0,numSelect);
+        return ans;
+    }
+};
+```
+

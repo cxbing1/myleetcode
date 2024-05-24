@@ -1,0 +1,36 @@
+class Solution {
+    public int maxArea(int[] height) {
+        //return maxArea_bl(height);
+        return maxArea_doublepoint(height);
+    }
+    public int maxArea_doublepoint(int[] height){
+        int max = 0,i = 0,j = height.length-1;
+        while(i<j){
+            int s = Math.min(height[i],height[j]) * (j-i);
+            if(s > max) {
+                max = s;
+            }
+            if(height[i] < height[j]){
+                i++;
+            }else {
+                j--;
+            }
+        }
+
+        return max;
+    }
+    public int maxArea_bl(int[] height) {
+        int Smax = 0;
+        for(int i = 0;i<height.length-1;i++){
+            for(int j = i+1;j<height.length;j++){
+                int s = (j-i) * Math.min(height[i],height[j]);
+                if(s>Smax){
+                    Smax = s;
+                }
+            }
+        }
+        return Smax;
+    }
+}
+//runtime:3 ms
+//memory:38.6 MB

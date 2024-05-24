@@ -1,0 +1,74 @@
+> Problem: [894. 所有可能的真二叉树](https://leetcode.cn/problems/all-possible-full-binary-trees/description/)
+
+[TOC]
+
+# 思路
+
+这题比较有迷惑性, 笔者一开始往递归方向思考, 发现难点在于**去重**. 即使加上回溯, 也不能避免同一个树被多次构造.
+
+~~看了题解后~~更换思路, 才明白这题更好的思路是DP来处理. 这也是树的一个重要性质: **子结构的重复性, 如果树本身是solve(n), 那么左子树就是solve(i), 右子树就是solve(n-1-i)**. 也就是说, 构造一棵总节点数为n的树, 可以枚举左右子树的所有可能, 然后创建一个根节点, 构成整个树.
+
+这个DP的思路就是"用小的部分构造大的部分", 这与斐波那契数列的构造是类似的.
+
+# Code
+
+* []
+
+```C++
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+    vector<vector<TreeNode*>> dp;
+    void solve(int k) {
+        if (k % 2 == 0) {
+            return ;
+        }
+        // k = 1 + x + y, x + y = k-1
+        for (int i = 0; i <= k-1; i++) {
+            int j = k - 1 - i;
+            if (i == 0) {
+                for (auto r: dp[j]) {
+                    TreeNode* cur = new TreeNode(0);
+                    cur->right = r;
+                    dp[k].push_back(cur);
+                }
+            }
+            if (j == 0) {
+                for (auto l: dp[i]) {
+                    TreeNode* cur = new TreeNode(0);
+                    cur->left = l;
+                    dp[k].push_back(cur);
+                }
+            }
+            for (auto l: dp[i]) {
+                for (auto r: dp[j]) {
+                    TreeNode* cur = new TreeNode(0);
+                    cur->left = l;
+                    cur->right = r;
+                    dp[k].push_back(cur);
+                }
+            }
+        }
+    }
+public:
+    vector<TreeNode*> allPossibleFBT(int n) {
+        this->dp.resize(21);
+        TreeNode*tmp = new TreeNode(0);
+        dp[1].push_back(tmp);
+        for (int i = 2; i <= n; i++) {
+            solve(i); 
+        }
+        return dp[n];
+    }
+};
+```
+

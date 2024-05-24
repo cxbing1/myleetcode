@@ -1,0 +1,117 @@
+> [2707. 字符串中的额外字符](https://leetcode.cn/problems/extra-characters-in-a-string/)
+
+[TOC]
+
+# 题目
+
+给你一个下标从 **0** 开始的字符串 `s` 和一个单词字典 `dictionary` 。你需要将 `s` 分割成若干个 **互不重叠** 的子字符串，每个子字符串都在 `dictionary` 中出现过。`s` 中可能会有一些 **额外的字符** 不在任何子字符串中。
+
+请你采取最优策略分割 `s` ，使剩下的字符 **最少** 。
+
+# 题目分析
+
+## 思路分析
+
+这道题的题目意思是，将字符串 `s` 切分成若干个子串，使得尽可能多的子串对应的单词存在于 `dictionary` 中，即剩下的字符最少。
+
+字符串的切割我们可以思考用动态规划来尝试解决。
+
+对于每个索引 `i` 对应的字符 `s[i]`，其无非只有两种选择：
+
+1. 作为剩下的字符；
+2. 作为某个存在于单词字典的子串的字符；
+
+![image-20240109010505518.png](https://pic.leetcode.cn/1704733764-jzUzew-image-20240109010505518.png)
+
+## 动态规划
+
+**状态**
+
+从上面图可知我们需要知道给定索引 `j`， `s[0,j]`部分进行分割 后，剩下的最少字符。
+于是我们抽象出了我们需要规划的状态 `dp[j]`：表示`s[0,j]`部分进行分割 后剩下的最少字符。
+
+**状态转移方程**：
+
+- 如果 `s[i]` 作为剩下的字符，那么 `dp[i] = dp[i - 1] + 1`，即`s[0,i]`部分进行分割 后剩下的最少字符等价于`s[0,i-1]`部分进行分割 后剩下的最少字符再加上 `s[i]` 这个字符；
+- 如果 `s[i]` 参与到构建子串，那么就要枚举 `j∈[0,i]`，如果 `s[j, i]` 是目标子串，这部分就不会产生剩下的字符。`s[0,i]`部分进行分割 后剩下的最少字符等价于`s[0,j-1]`部分进行分割 后剩下的最少字符。可能有多个 `j` 满足条件，应该取剩下字符最少的那个，即 `dp[i]=min(dp[j-1]), j∈[0,i] 且 s[j,i] ∈ dictionary`
+- 最终 `dp[i]` 取二者的最小值，即 `dp[i] = min(dp[i - 1] + 1, min(dp[j-1]))`;
+
+**初始值**：
+我们可以看到，当 `i=0` 或 `j = 0` 时会出现 `i-1` 或 `j-1` 为负数的情况。事实当 `i = 0`时，其之前就没有字符，剩下的字符数可以认为是 `0`。
+
+**修正**：
+即我们认为 `dp[-1] = 0`。为了表示这种情况，我们将 `dp` 数组的索引**集体右移一位**，即原本的 `dp[i]` 变成 `dp[i+1]`。这样 `dp[0] = 0` 就表示 `dp[-1]` 的情况。
+
+而原本的状态转移方程变更为：`dp[i+1] = min(dp[i] + 1, min(dp[j]))`【集体加 `1`】
+
+> 参考
+
+[灵神(灵茶山艾府)题解 ——《动态规划：从记忆化搜索到递推（Python/Java/C++/Go）》](https://leetcode.cn/problems/extra-characters-in-a-string/solutions/2286613/dong-tai-gui-hua-cong-ji-yi-hua-sou-suo-wtd7a/?envType=daily-question&envId=2024-01-09)
+
+# 代码
+
+* []
+
+```Java
+class Solution {
+    public int minExtraChar(String s, String[] dictionary) {
+        int n = s.length();       // 字符串长度
+        int[] dp = new int[n+1];  // dp[i+1] 表示截至到字符串索引i位置的最少额外字符数
+        Set<String> dictionarySet = new HashSet<>();  // 将字典转为哈希表存储，方便查找
+        for(String word: dictionary){
+            dictionarySet.add(word);
+        }
+        for(int i = 0; i < n; i++){
+            dp[i + 1] = dp[i] + 1;  // 字符i不参与子串的情况
+            for(int j = 0; j <= i; j++){
+                // 字符i参与子串的情况，取最小值
+                if(dictionarySet.contains(s.substring(j, i + 1))){
+                    dp[i + 1] = Math.min(dp[i + 1], dp[j]);
+                }
+            }
+        }
+        return dp[n];   // dp[n] 即为截至到索引n-1位置的最少额外字符数
+    }
+}
+```
+
+* []
+
+```Python
+class Solution:
+    def minExtraChar(self, s: str, dictionary: List[str]) -> int:
+        n = len(s)          # 字符串长度
+        dp = [0] * (n+1)    # dp[i+1] 表示截至到字符串索引i位置的最少额外字符数
+        dictionary_set = set(dictionary)  # 将字典转为哈希表存储，方便查找
+        for i in range(n):
+            dp[i + 1] = dp[i] + 1  # 字符i不参与子串的情况
+            for j in range(i+1):
+                # 字符i参与子串的情况，取最小值
+                if s[j: i+1] in dictionary_set:
+                    dp[i + 1] = min(dp[i + 1], dp[j])
+        return dp[n]   # dp[n] 即为截至到索引n-1位置的最少额外字符数
+```
+
+* []
+
+```C++
+class Solution {
+public:
+    int minExtraChar(string s, vector<string>& dictionary) {
+        int n = s.size();       // 字符串长度
+        vector<int> dp(n + 1);  // dp[i+1] 表示截至到字符串索引i位置的最少额外字符数
+        unordered_set<string> dictionarySet(dictionary.begin(), dictionary.end());  // 将字典转为哈希表存储，方便查找
+        for(int i = 0; i < n; i++){
+            dp[i + 1] = dp[i] + 1;  // 字符i不参与子串的情况
+            for(int j = 0; j <= i; j++){
+                // 字符i参与子串的情况，取最小值
+                if(dictionarySet.find(s.substr(j, i - j + 1)) != dictionarySet.end()){
+                    dp[i + 1] = min(dp[i + 1], dp[j]);
+                }
+            }
+        }
+        return dp[n];   // dp[n] 即为截至到索引n-1位置的最少额外字符数
+    }
+};
+```
+

@@ -1,0 +1,127 @@
+> Problem: [2917. 找出数组中的 K-or 值](https://leetcode.cn/problems/find-the-k-or-of-an-array/description/)
+
+[TOC]
+
+# 思路
+
+> 题意：显然统计 `nums` 数组中每个元素二进制为1的位，若存在`k`个元素的第`i`位为1，则$ret = ret ~|~ 2^i$。因此只需统计所有元素为1的位，然后找出总数大于等于`k`的位，并`或操作`就行。
+
+# 解题方法
+
+- 解1：分类位运算
+  - 若`k == n`，则要找出所有元素都为1的二进制位，显然所有元素`与操作`即为结果。
+  - 若`k < n`，则统计所有元素的二进制位，找出个数大于等于`k`的位，将这些位`或操作`即为结果。其中最高位数不大于`nums中的最大值`。
+- 解2：暴力位运算
+  - 直接统计`31`位，每次遍历所有元素，用`cnt`记录有多少元素该位为1。设当前为第`i`位，若`cnt >= k`，则$ret = ret ~|~ 2^i$。
+  - 遍历完`31`位，返回`ret`即为结果。
+
+# 复杂度
+
+**解1**： 记最大值为`mx`，该值最高位为`highbit`，时间复杂度 $O(n \times highbit) = O(n)$；空间复杂度: $O(1)$。
+**解2**： 时间复杂度 $O(n \times 31) = O(n)$；空间复杂度: $O(1)$。
+
+# Code
+
+## 解一：分类位运算
+
+![image.png](https://pic.leetcode.cn/1709775727-FZVuVs-image.png)
+
+* []
+
+```C++
+class Solution {
+public:
+    int findKOr(vector<int>& nums, int k) {
+        int n = nums.size(), ret = 0, mx = *max_element(nums.begin(), nums.end()), cnt = 0;
+        if(k == n) {
+            ret = INT_MAX;
+            for(auto x : nums) ret &= x;
+            return ret;
+        }
+        for(long long i = 1; i <= mx; i <<= 1) {
+            cnt = 0;
+            for(auto x : nums) {
+                if(i & x) {
+                    if(++cnt >= k) ret |= i;
+                }
+            }
+        }
+        return ret;
+    }
+};
+```
+
+* []
+
+```Python
+class Solution:
+    def findKOr(self, nums: List[int], k: int) -> int:
+        n, cnt, ret, i = len(nums), 0, 0, 1
+        if n == k:
+            ret = nums[0]
+            for x in nums[1:n]:
+                ret &= x
+            return ret
+        while i <= max(nums):
+            cnt = 0
+            for x in nums:
+                if i & x:
+                    cnt += 1
+                    if cnt >= k:
+                        ret |= i
+            i <<= 1
+        return ret
+```
+
+## 解二：暴力位运算
+
+![image.png](https://pic.leetcode.cn/1709775749-nGfFNI-image.png)
+
+* []
+
+```C++
+class Solution {
+public:
+    int findKOr(vector<int>& nums, int k) {
+        int cnt, ret = 0;
+        for(long long i = 1; i <= INT_MAX; i <<= 1) {
+            cnt = 0;
+            for(auto x : nums) if(i & x) if(++cnt >= k) ret |= i;
+        }
+        return ret;
+    }
+};
+```
+
+* []
+
+```Python
+class Solution:
+    def findKOr(self, nums: List[int], k: int) -> int:
+        cnt, ret, i = 0, 0, 1
+        while i <= max(nums):
+            cnt = 0
+            for x in nums:
+                if i & x:
+                    cnt += 1
+                    if cnt >= k:
+                        ret |= i
+                        break
+            i <<= 1
+        return ret
+```
+
+**Python写法2：**
+
+* []
+
+```Python
+class Solution:
+    def findKOr(self, nums: List[int], k: int) -> int:
+        ret, i = 0, 1
+        for i in range(31):
+            if sum((x >> i) & 1 for x in nums) >= k:
+                ret |= (1 << i)
+        return ret
+```
+
