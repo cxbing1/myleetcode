@@ -64,7 +64,7 @@ public class DoubleModularExponentiation {
         public List<Integer> getGoodIndices(int[][] variables, int target) {
             List<Integer> goodIndices = new ArrayList<>();
             for (int i = 0; i < variables.length; i++) {
-                if (mod(mod(variables[i][0],variables[i][1],10),variables[i][2],variables[i][3]) == target) {
+                if (mod2(mod2(variables[i][0], variables[i][1], 10), variables[i][2], variables[i][3]) == target) {
                     goodIndices.add(i);
                 }
             }
@@ -72,14 +72,26 @@ public class DoubleModularExponentiation {
         }
 
         public int mod(int x, int y, int mod) {
-            if(y==1) {
+            if (y == 1) {
                 return x % mod;
             }
-            if(y==0) {
+            if (y == 0) {
                 return 1;
             }
-            int tmp = mod(x,y/2,mod);
-            return tmp * tmp * (y%2==1 ? x : 1) % mod;
+            int tmp = mod(x, y / 2, mod);
+            return tmp * tmp * (y % 2 == 1 ? x : 1) % mod;
+        }
+
+        public int mod2(int x, int y, int mod) {
+            int res = 1;
+            while (y != 0) {
+                if ((y & 1) == 1) {
+                    res = res * x % mod;
+                }
+                x = x * x % mod;
+                y = y >> 1;
+            }
+            return res;
         }
     }
 //leetcode submit region end(Prohibit modification and deletion)
