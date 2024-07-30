@@ -51,16 +51,18 @@
 // Related Topics 数组 哈希表 二分查找 滑动窗口 👍 80 👎 0
 
 package com.cute.leetcode.editor.cn;
+
 public class MinimumNumberOfOperationsToMakeArrayContinuous {
     public static void main(String[] args) {
         Solution solution = new MinimumNumberOfOperationsToMakeArrayContinuous().new Solution();
     }
-    //leetcode submit region begin(Prohibit modification and deletion)
-class Solution {
-    public int minOperations(int[] nums) {
 
+    //leetcode submit region begin(Prohibit modification and deletion)
+    class Solution {
+        public int minOperations(int[] nums) {
+            return 0;
+        }
     }
-}
 //leetcode submit region end(Prohibit modification and deletion)
 
 }
