@@ -70,6 +70,9 @@ public class DoubleModularExponentiation {
             }
             return goodIndices;
         }
+        public void test() {
+            System.out.println(mod2(2, 3, 10));
+        }
 
         public int mod(int x, int y, int mod) {
             if (y == 1) {
